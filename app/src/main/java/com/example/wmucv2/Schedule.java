@@ -10,7 +10,6 @@ import static com.example.wmucv2.RadioService.THURS;
 import static com.example.wmucv2.RadioService.TUES;
 import static com.example.wmucv2.RadioService.WED;
 import static com.example.wmucv2.RadioService.currChannel;
-import static com.example.wmucv2.RadioService.currDay;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -29,12 +28,15 @@ import com.example.wmucv2.databinding.ActivityMainBinding;
 import com.example.wmucv2.databinding.ActivityScheduleBinding;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 
 public class Schedule extends AppCompatActivity {
 
     RecyclerView shows;
     ArrayList<Show> showList;
     ImageView back;
+    int currDay;
 
 
     private int channel;
@@ -44,6 +46,7 @@ public class Schedule extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
+
         back = findViewById(R.id.backbtn);
         sun = findViewById(R.id.Sun);
         mon = findViewById(R.id.Mon);
@@ -57,7 +60,31 @@ public class Schedule extends AppCompatActivity {
         shows = findViewById(R.id.show_recycler);
         showList = new ArrayList<>();
         currDayText = findViewById(R.id.currDay);
-        setShowList(0,0);
+        Calendar c = Calendar.getInstance();
+        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+
+        if (dayOfWeek == Calendar.SUNDAY) {
+            setShowList(currChannel,0);
+            currDayText.setText("Sunday");
+        } else if (dayOfWeek == Calendar.MONDAY) {
+            setShowList(currChannel,1);
+            currDayText.setText("Monday");
+        } else if (dayOfWeek == Calendar.TUESDAY) {
+            setShowList(currChannel,2);
+            currDayText.setText("Tuesday");
+        } else if (dayOfWeek == Calendar.WEDNESDAY) {
+            setShowList(currChannel,3);
+            currDayText.setText("Wednesday");
+        } else if (dayOfWeek == Calendar.THURSDAY) {
+            setShowList(currChannel,4);
+            currDayText.setText("Thursday");
+        } else if (dayOfWeek == Calendar.FRIDAY) {
+            setShowList(currChannel,5);
+            currDayText.setText("Friday");
+        } else {
+            setShowList(currChannel,6);
+            currDayText.setText("Saturday");
+        }
         setAdapter();
         //Set buttons for changing day
         sun.setOnClickListener(new View.OnClickListener() {
@@ -170,7 +197,7 @@ public class Schedule extends AppCompatActivity {
     private void setShowList(int channel, int day) {
         showList.clear();
         Show showToAdd = null;
-        Show currShow=null;
+        Show currShow;
 
         int begTime = 0;
         for (int i=0; i<24; i++) {
@@ -179,17 +206,13 @@ public class Schedule extends AppCompatActivity {
             } else {
                 currShow = MainActivity.digSched[i][day];
             }
-            if (showToAdd==null) {
-                showToAdd = currShow;
-            } else if (!currShow.showName.equals(showToAdd.showName)){
-                showToAdd.startTime=(begTime<10) ?  begTime + "0:00" :  begTime + ":00";
-                showToAdd.endTime=(i<10) ?  i + "0:00" :  i + ":00";
-                showList.add(showToAdd);
-                begTime=i;
-                showToAdd=currShow;
+            if (currShow==null) {
+                break;
+            } else {
+                showList.add(currShow);
             }
         }
-        return;
+        Collections.sort(showList);
     }
 
 }

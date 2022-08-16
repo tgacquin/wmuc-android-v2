@@ -1,129 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".RadioService">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="409dp"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="405dp"
-        android:layout_height="39dp"
-        android:layout_marginTop="16dp"
-        android:contentDescription="@string/todo"
-        android:foregroundGravity="center|center_horizontal"
-        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
         app:srcCompat="@drawable/wmuc" />
 
+    <TextView
+        android:id="@+id/showname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageView2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:fontFamily="@font/avenir"
+        android:text="something"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/showhost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/showname"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/avenirroman"
+        android:text="TextView"
+        android:textColor="#000000" />
+
     <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="305dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="180dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+        android:id="@+id/stations_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/showhost"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp">
 
         <ImageView
             android:id="@+id/FM"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
-            android:layout_weight="1"
-            android:contentDescription="TODO"
-            android:maxWidth="125dp"
-            android:maxHeight="225dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_centerHorizontal="true"
             app:srcCompat="@drawable/fm" />
 
         <ImageView
             android:id="@+id/DIG"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
-            android:layout_weight="1"
-            android:contentDescription="TODO"
-            android:maxWidth="125dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_centerHorizontal="true"
+            android:layout_toEndOf="@+id/FM"
             app:srcCompat="@drawable/digital" />
+        >
     </LinearLayout>
+
 
     <ImageView
         android:id="@+id/Play"
         android:layout_width="40dp"
-        android:layout_height="80dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        app:layout_constraintVertical_bias="0.423"
+        android:layout_height="40dp"
+        android:layout_below="@+id/stations_container"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="47dp"
         app:srcCompat="@drawable/play" />
-
-    <LinearLayout
-        android:layout_width="138dp"
-        android:layout_height="81dp"
-        android:foregroundGravity="center_horizontal"
-        android:gravity="center_horizontal|center_vertical"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar">
-
-        <TextView
-            android:id="@+id/showname"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center|center_horizontal"
-            android:width="100px"
-            android:fontFamily="@font/avenir"
-            android:gravity="center_horizontal"
-            android:text="Station name"
-            android:textColor="#000000"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/showhost"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/avenirroman"
-            android:gravity="center_horizontal"
-            android:text="DJ's"
-            android:textColor="#000000"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-    </LinearLayout>
 
     <ImageView
         android:id="@+id/schedule"
-        android:layout_width="70dp"
-        android:layout_height="80dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Play"
-        app:layout_constraintVertical_bias="0.558"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/Play"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="5dp"
         app:srcCompat="@drawable/schedule" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

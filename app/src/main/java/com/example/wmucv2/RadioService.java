@@ -1,26 +1,25 @@
 package com.example.wmucv2;
 
-import android.animation.ObjectAnimator;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.media3.common.MediaItem;
-import androidx.media3.datasource.DataSource;
+import androidx.media3.common.Player;
 import androidx.media3.datasource.DefaultHttpDataSource;
 import androidx.media3.datasource.HttpDataSource;
-import androidx.media3.exoplayer.DefaultRenderersFactory;
-import androidx.media3.exoplayer.ExoPlayer;
-import androidx.media3.exoplayer.RenderersFactory;
 import androidx.media3.exoplayer.SimpleExoPlayer;
-import androidx.media3.exoplayer.hls.HlsMediaSource;
 import androidx.media3.exoplayer.source.ProgressiveMediaSource;
-import androidx.media3.exoplayer.trackselection.AdaptiveTrackSelection;
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 
 import java.util.Calendar;
 
@@ -33,8 +32,9 @@ public class RadioService extends AppCompatActivity {
     ImageView fmStation;
     ImageView playBtn;
     ImageView scheduleBtn;
+    boolean isBound = false;
+    SimpleExoPlayer audioPlayer;
 
-    public static int currDay=0;
     public static int currChannel=7;
     public static int FM = 7;
     public static int DIGITAL = 8;
@@ -55,38 +55,48 @@ public class RadioService extends AppCompatActivity {
     private final Uri digURI = Uri.parse("http://wmuc.umd.edu:8000/wmuc2-high");
 
 
+
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        Context context = getApplicationContext();
+        Intent intent = new Intent(this, PlayerService.class); // Build the intent for the service
+        context.startForegroundService(intent);
+        doBindService();
+
+
         setContentView(R.layout.activity_radio_selection);
+        HttpDataSource.Factory factory = new DefaultHttpDataSource.Factory();
 
         fmStation=findViewById(R.id.FM);
         digStation=findViewById(R.id.DIG);
         playBtn=findViewById(R.id.Play);
         scheduleBtn=findViewById(R.id.schedule);
-        showName=findViewById(R.id.showname);
-        showHost=findViewById(R.id.showhost);
+        showName=findViewById(R.id.showhost);
+        showHost=findViewById(R.id.showname);
 
-        DefaultTrackSelector trackSelector = new DefaultTrackSelector(this, new AdaptiveTrackSelection.Factory());
-        DefaultTrackSelector.Parameters trackSelectorParameters = trackSelector.buildUponParameters().setMaxAudioChannelCount(0).build();
-        trackSelector.setParameters(trackSelectorParameters);
-        RenderersFactory renderersFactory = new DefaultRenderersFactory(this);
-        SimpleExoPlayer audioPlayer = new SimpleExoPlayer.Builder(this, renderersFactory).setTrackSelector(trackSelector).build();
-        HttpDataSource.Factory factory = new DefaultHttpDataSource.Factory();
+        fmStation.setImageAlpha(150);
+        digStation.setImageAlpha(150);
 
         fmStation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!fmHit) {
+                    fmStation.setImageAlpha(255);
+                    digStation.setImageAlpha(150);
                     currChannel=FM;
                     getCurrShow();
                     fmHit=true;
                     digitalHit=false;
-                    playing=true;
-                    playBtn.setImageResource(R.drawable.pause);
-                    audioPlayer.setMediaSource(new ProgressiveMediaSource.Factory(factory).createMediaSource(MediaItem.fromUri(digURI)));
+                    if (audioPlayer.isPlaying()) {
+                        playBtn.setImageResource(R.drawable.pause);
+                    }
+                    audioPlayer.setMediaSource(new ProgressiveMediaSource.Factory(factory).createMediaSource(MediaItem.fromUri(fmURI)));
                     audioPlayer.prepare();
-                    audioPlayer.setPlayWhenReady(true);
                 }
             }
         });
@@ -95,15 +105,19 @@ public class RadioService extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!digitalHit) {
+                    if (isBound==true) {
+                    fmStation.setImageAlpha(150);
+                    digStation.setImageAlpha(255);
                     currChannel=DIGITAL;
                     getCurrShow();
                     fmHit=false;
                     digitalHit=true;
-                    playing=true;
-                    playBtn.setImageResource(R.drawable.pause);
-                    audioPlayer.setMediaSource(new ProgressiveMediaSource.Factory(factory).createMediaSource(MediaItem.fromUri(fmURI)));
+                    if (audioPlayer.isPlaying()) {
+                        playBtn.setImageResource(R.drawable.pause);
+                    }
+                    audioPlayer.setMediaSource(new ProgressiveMediaSource.Factory(factory).createMediaSource(MediaItem.fromUri(digURI)));
                     audioPlayer.prepare();
-                    audioPlayer.setPlayWhenReady(true);
+                    }
                 }
             }
         });
@@ -113,15 +127,10 @@ public class RadioService extends AppCompatActivity {
             public void onClick(View v) {
                 if (!fmHit && !digitalHit) {
                     return;
-                } else if (playing==true){
-                    playBtn.setImageResource(R.drawable.play);
+                } else if (audioPlayer.isPlaying()){
                     audioPlayer.pause();
-                    playing = false;
                 } else {
-                    playBtn.setImageResource(R.drawable.pause);
-                    audioPlayer.play();
-
-                    playing = true;
+                    audioPlayer.setPlayWhenReady(true);
                 }
             }
         });
@@ -132,69 +141,130 @@ public class RadioService extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), Schedule.class));
             }
         });
-
-
-
-
-
-
-/*
-        ExoPlayer player = new ExoPlayer.Builder(RadioService.this).build();
-        DataSource.Factory dataSourceFactory = new DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true);
-        HlsMediaSource hlsMediaSource =
-                new HlsMediaSource.Factory(dataSourceFactory)
-                        .setAllowChunklessPreparation(false) // use it only if needed
-                        .createMediaSource(MediaItem.fromUri(fmURI)); // pass your url
-        player.addMediaSource(hlsMediaSource);
-        player.prepare();
-        player.setPlayWhenReady(true);
-        player.play();
-*/
-
-
-
-
     }
 
+    private void doBindService() {
+        Intent playerServiceIntent = new Intent(this, PlayerService.class);
+        bindService(playerServiceIntent, playerServiceConnection, Context.BIND_AUTO_CREATE);
+        System.out.println("reached!");
+    }
+
+    ServiceConnection playerServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder iBinder) {
+            PlayerService.ServiceBinder binder = (PlayerService.ServiceBinder) iBinder;
+            audioPlayer = binder.getPlayerService().player;
+            isBound=true;
+            System.out.println("reached!2");
+            audioPlayer.addListener(new Player.Listener() {
+                @Override
+                public void onIsPlayingChanged(boolean isPlaying) {
+                    Player.Listener.super.onIsPlayingChanged(isPlaying);
+                    if (isPlaying==true || audioPlayer.getPlaybackState()==Player.STATE_BUFFERING
+                || audioPlayer.getPlaybackState()==Player.STATE_IDLE) {
+                        playBtn.setImageResource(R.drawable.pause);
+                    } else {
+                        playBtn.setImageResource(R.drawable.play);
+                    }
+                }
+            });
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
+
+    public static int getShowIndex(Show[][] sched, int day, int currHour) {
+        for (int i=0; i<24; i++) {
+            Show currShow = sched[i][day];
+            if (currShow==null) {
+                break;
+            } else {
+                if (currHour>=currShow.startTimeInt && currHour<currShow.endTimeInt) {
+                    return i;
+                }
+            }
+        }
+        return 23; //Will return off the air
+    }
 
     //Reuse of old WMUC Android code
     public void getCurrShow() {
         Calendar c = Calendar.getInstance();
         int hourOfDay = c.get(Calendar.HOUR_OF_DAY);
         int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+        int indexOfShow;
 
+
+        //Should use a switch statement here instead
         if(currChannel == DIGITAL) {
             if (dayOfWeek == Calendar.SUNDAY) {
-                show = MainActivity.digSched[hourOfDay][0];
+                show = MainActivity.digSched
+                        [getShowIndex(MainActivity.digSched,0,hourOfDay)]
+                        [0];
             } else if (dayOfWeek == Calendar.MONDAY) {
-                show = MainActivity.digSched[hourOfDay][1];
+                show = MainActivity.digSched
+                        [getShowIndex(MainActivity.digSched,1,hourOfDay)]
+                        [1];
             } else if (dayOfWeek == Calendar.TUESDAY) {
-                show = MainActivity.digSched[hourOfDay][2];
+                show = MainActivity.digSched
+                        [getShowIndex(MainActivity.digSched,2,hourOfDay)]
+                        [2];
             } else if (dayOfWeek == Calendar.WEDNESDAY) {
-                show = MainActivity.digSched[hourOfDay][3];
+                show = MainActivity.digSched
+                        [getShowIndex(MainActivity.digSched,3,hourOfDay)]
+                        [3];
             } else if (dayOfWeek == Calendar.THURSDAY) {
-                show = MainActivity.digSched[hourOfDay][4];
+                show = MainActivity.digSched
+                        [getShowIndex(MainActivity.digSched,4,hourOfDay)]
+                        [4];
             } else if (dayOfWeek == Calendar.FRIDAY) {
-                show = MainActivity.digSched[hourOfDay][5];
+                show = MainActivity.digSched
+                        [getShowIndex(MainActivity.digSched,5,hourOfDay)]
+                        [5];
             } else if (dayOfWeek == Calendar.SATURDAY) {
-                show = MainActivity.digSched[hourOfDay][6];
+                show = MainActivity.digSched
+                        [getShowIndex(MainActivity.digSched,6,hourOfDay)]
+                        [6];
             }
         } else if(currChannel == FM) {
             if (dayOfWeek == Calendar.SUNDAY) {
-                show = MainActivity.fmSched[hourOfDay][0];
+                show = MainActivity.fmSched
+                        [getShowIndex(MainActivity.fmSched,0,hourOfDay)]
+                        [0];
             } else if (dayOfWeek == Calendar.MONDAY) {
-                show = MainActivity.fmSched[hourOfDay][1];
+                show = MainActivity.fmSched
+                        [getShowIndex(MainActivity.fmSched,1,hourOfDay)]
+                        [1];
             } else if (dayOfWeek == Calendar.TUESDAY) {
-                show = MainActivity.fmSched[hourOfDay][2];
+                show = MainActivity.fmSched
+                        [getShowIndex(MainActivity.fmSched,2,hourOfDay)]
+                        [2];
             } else if (dayOfWeek == Calendar.WEDNESDAY) {
-                show = MainActivity.fmSched[hourOfDay][3];
+                show = MainActivity.fmSched
+                        [getShowIndex(MainActivity.fmSched,3,hourOfDay)]
+                        [3];
             } else if (dayOfWeek == Calendar.THURSDAY) {
-                show = MainActivity.fmSched[hourOfDay][4];
+                show = MainActivity.fmSched
+                        [getShowIndex(MainActivity.fmSched,4,hourOfDay)]
+                        [4];
             } else if (dayOfWeek == Calendar.FRIDAY) {
-                show = MainActivity.fmSched[hourOfDay][5];
+                show = MainActivity.fmSched
+                        [getShowIndex(MainActivity.fmSched,5,hourOfDay)]
+                        [5];
             } else if (dayOfWeek == Calendar.SATURDAY) {
-                show = MainActivity.fmSched[hourOfDay][6];
+                show = MainActivity.fmSched
+                        [getShowIndex(MainActivity.fmSched,6,hourOfDay)]
+                        [6];
             }
+        }
+        if (show==null) {
+            showName.setText("Off The Air");
+            showHost.setText("None");
+            return;
         }
         showName.setText(show.showName);
         showHost.setText(show.showHost);
