@@ -140,7 +140,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/show_recycler"
         android:layout_width="380dp"
-        android:layout_height="300dp"
+        android:layout_height="500dp"
         android:layout_below="@+id/stations_layout"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp" />
