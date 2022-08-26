@@ -76,8 +76,8 @@ public class RadioService extends AppCompatActivity {
         digStation=findViewById(R.id.DIG);
         playBtn=findViewById(R.id.Play);
         scheduleBtn=findViewById(R.id.schedule);
-        showName=findViewById(R.id.showhost);
-        showHost=findViewById(R.id.showname);
+        showName=findViewById(R.id.showname);
+        showHost=findViewById(R.id.showhost);
 
         fmStation.setImageAlpha(150);
         digStation.setImageAlpha(150);
