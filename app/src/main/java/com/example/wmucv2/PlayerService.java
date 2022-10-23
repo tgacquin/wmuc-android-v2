@@ -1,6 +1,7 @@
 package com.example.wmucv2;
 
 import static android.app.NotificationManager.IMPORTANCE_HIGH;
+import static android.app.NotificationManager.IMPORTANCE_LOW;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -69,12 +70,12 @@ public class PlayerService extends Service {
                 .setNotificationListener(notificationListener)
                 .setSmallIconResourceId(R.drawable.smallicon)
                 .setMediaDescriptionAdapter(descriptionAdapter)
-                .setChannelImportance(IMPORTANCE_HIGH)
+                .setChannelImportance(IMPORTANCE_LOW)
                 .setChannelNameResourceId(R.string.channel_name)
                 .build();
 
         notificationManager.setPlayer(player);
-        notificationManager.setPriority(NotificationCompat.PRIORITY_MAX);
+        notificationManager.setPriority(NotificationCompat.PRIORITY_MIN);
         notificationManager.setUseRewindAction(false);
         notificationManager.setUseFastForwardAction(false);
     }

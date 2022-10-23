@@ -1,31 +1,25 @@
 package com.example.wmucv2;
 
-import static com.example.wmucv2.RadioService.DIGITAL;
-import static com.example.wmucv2.RadioService.FM;
-import static com.example.wmucv2.RadioService.FRI;
-import static com.example.wmucv2.RadioService.MON;
-import static com.example.wmucv2.RadioService.SAT;
-import static com.example.wmucv2.RadioService.SUN;
-import static com.example.wmucv2.RadioService.THURS;
-import static com.example.wmucv2.RadioService.TUES;
-import static com.example.wmucv2.RadioService.WED;
-import static com.example.wmucv2.RadioService.currChannel;
+import static com.example.wmucv2.RadioSelection.DIGITAL;
+import static com.example.wmucv2.RadioSelection.FM;
+import static com.example.wmucv2.RadioSelection.FRI;
+import static com.example.wmucv2.RadioSelection.MON;
+import static com.example.wmucv2.RadioSelection.SAT;
+import static com.example.wmucv2.RadioSelection.SUN;
+import static com.example.wmucv2.RadioSelection.THURS;
+import static com.example.wmucv2.RadioSelection.TUES;
+import static com.example.wmucv2.RadioSelection.WED;
+import static com.example.wmucv2.RadioSelection.currChannel;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-
-import com.example.wmucv2.databinding.ActivityMainBinding;
-import com.example.wmucv2.databinding.ActivityScheduleBinding;
 
 import java.util.ArrayList;
 import java.util.Calendar;

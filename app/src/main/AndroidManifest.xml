@@ -22,7 +22,7 @@
             android:name=".Schedule"
             android:exported="false" />
         <activity
-            android:name=".RadioService"
+            android:name=".RadioSelection"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

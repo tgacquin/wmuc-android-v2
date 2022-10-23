@@ -5,15 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -21,8 +12,6 @@ import java.text.SimpleDateFormat;
 
 import java.util.*;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -31,15 +20,15 @@ public class MainActivity extends AppCompatActivity {
     //Load the schedule data on bootup
     public static Show[][] digSched = new Show[24][7];
     public static Show[][] fmSched = new Show[24][7];
-    String digUrl = "https://wmucmusic.com/api/schedule/DIG";
-    String fmUrl = "https://wmucmusic.com/api/schedule/FM";
+    String digUrl = "https://dev.wmuc.umd.edu/api/schedule/DIG";
+    String fmUrl = "https://dev.wmuc.umd.edu/api/schedule/FM";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initCrawler();
-        startActivity(new Intent(this, RadioService.class));
+        startActivity(new Intent(this, RadioSelection.class));
         finish();
     }
 

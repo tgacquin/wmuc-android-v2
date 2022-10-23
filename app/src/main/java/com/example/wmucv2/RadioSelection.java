@@ -24,7 +24,7 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource;
 import java.util.Calendar;
 
 
-public class RadioService extends AppCompatActivity {
+public class RadioSelection extends AppCompatActivity {
     Show show;
     TextView showName;
     TextView showHost;
